@@ -1,0 +1,24 @@
+{
+    "name": "Unity.WowExportUnityifier.Editor",
+    "rootNamespace": "",
+    "references": [
+        "Unity.WowExportUnityifier"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.render-pipelines.universal",
+            "expression": "12.0.0",
+            "define": "UNITY_UNIVERSAL_RP_12_0_0_OR_GREATER"
+        }
+    ],
+    "noEngineReferences": false
+}
