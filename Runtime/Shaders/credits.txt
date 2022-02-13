@@ -1,0 +1,2 @@
+Credits to this wonder write-up that gave me an easy shader graph to follow to start making the billboard shaders:
+https://www.noveltech.dev/unity-billboard-shader-shadergraph/
