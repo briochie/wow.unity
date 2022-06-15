@@ -17,7 +17,7 @@ public class WoWExportUnityPostprocessor : AssetPostprocessor
 
     public override uint GetVersion()
     {
-        return 0;
+        return 1;
     }
 
     private bool ValidAsset()
@@ -44,6 +44,7 @@ public class WoWExportUnityPostprocessor : AssetPostprocessor
         textureImporter.textureCompression = TextureImporterCompression.Uncompressed;
         textureImporter.filterMode = FilterMode.Bilinear;
         textureImporter.mipmapEnabled = false;
+        textureImporter.sRGBTexture = false;
     }
 
     public void OnPreprocessModel()

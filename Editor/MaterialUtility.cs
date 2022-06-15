@@ -162,6 +162,11 @@ namespace WowExportUnityifier
         {
             string path = "Assets/Materials/" + material.name + ".mat";
 
+            if (!Directory.Exists("Assets/Materials"))
+            {
+                Directory.CreateDirectory("Assets/Materials");
+            }
+
             if (!File.Exists(path))
             {
                 AssetDatabase.CreateAsset(material, path);
