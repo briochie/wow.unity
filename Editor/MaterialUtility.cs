@@ -38,23 +38,27 @@ namespace WowExportUnityifier
             BlendAdd = 7
         }
 
-        public static Material ConfigureMaterial(MaterialDescription description, Material material, string modelImportPath)
+        public static Material ConfigureMaterial(MaterialDescription description, Material material, string modelImportPath, M2Utility.M2 metadata)
         {
             if (Regex.IsMatch(Path.GetFileNameWithoutExtension(modelImportPath), @"adt_\d{2}_\d{2}"))
                 return ProcessADTMaterial(description, material, modelImportPath);
 
-            M2Utility.M2 metadata = M2Utility.ReadMetadataFor(modelImportPath);
             M2Utility.Material materialData = M2Utility.GetMaterialData(material.name, metadata);
-
+            Color materialColor = Color.white;
+            //if (metadata != null && metadata.colors.Length > 0)
+            //{
+            //    materialColor = ProcessMaterialColors(material, metadata.colors[0]);
+            //}
+            
             material.shader = Shader.Find(LIT_SHADER);
-            material.SetColor("_BaseColor", Color.white);
+            material.SetColor("_BaseColor", materialColor);
 
             // Read a texture property from the material description.
             TexturePropertyDescription textureProperty;
             if (description.TryGetProperty("DiffuseColor", out textureProperty) && textureProperty.texture != null)
             {
                 // Assign the texture to the material.
-                material.SetTexture("_BaseMap", textureProperty.texture);
+                material.SetTexture("_MainTex", textureProperty.texture);
             }
                 
             ProcessFlagsForMaterial(material, materialData);
@@ -106,15 +110,17 @@ namespace WowExportUnityifier
             }
         }
 
-        public static void ProcessMaterialColors(Material material, M2Utility.ColorData data)
+        public static Color ProcessMaterialColors(Material material, M2Utility.ColorData data)
         {
-            M2Utility.Color color = data.color;
-            M2Utility.Alpha alpha = data.alpha;
+            Color newColor = new Color();
+            if (data.color.values.Count > 0)
+            {
+                newColor.r = data.color.values[0][0][0];
+                newColor.g = data.color.values[0][0][1];
+                newColor.b = data.color.values[0][0][2];
+            }
 
-            Color newColor = new Color(color.values[0][0], color.values[0][1], color.values[0][2]);
-            newColor.a = (float)alpha.values[0] / 65535.0f;
-
-            material.SetColor("_BaseColor", newColor);
+            return newColor;
         }
 
         public static Material ProcessADTMaterial(MaterialDescription description, Material material, string modelImportPath)
@@ -127,12 +133,12 @@ namespace WowExportUnityifier
                 material.SetTexture("_BaseMap", textureProperty.texture);
             }
 
-            LoadChunkData(material, modelImportPath);
+            LoadMetadataAndConfigureADT(material, modelImportPath);
 
             return material;
         }
 
-        public static void LoadChunkData(Material mat, string assetPath)
+        public static void LoadMetadataAndConfigureADT(Material mat, string assetPath)
         {
             string jsonFilePath = Path.GetDirectoryName(assetPath) + "\\" + mat.name + ".json";
             var sr = new StreamReader(Application.dataPath.Replace("Assets", "") + jsonFilePath);

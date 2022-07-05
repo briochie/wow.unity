@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,10 +21,7 @@ namespace WowExportUnityifier
 
         public static void BeginQueue()
         {
-            if (EditorApplication.update != null)
-            {
-                EditorApplication.update -= BeginQueue;
-            }
+            EditorApplication.update -= BeginQueue;
 
             if (importedModelPathQueue.Count == 0)
             {
@@ -39,6 +37,26 @@ namespace WowExportUnityifier
 
                 if (metadata.fileName == null)
                     continue;
+
+                if (metadata.textureTransforms[0].translation.timestamps.Count > 0)
+                {
+                    GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                    GameObject instantiatedGameObject = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                    Animation newAnimator = instantiatedGameObject.transform.GetChild(0).gameObject.GetComponent<Animation>();
+
+                    if (newAnimator == null)
+                    {
+                        newAnimator = instantiatedGameObject.transform.GetChild(0).gameObject.AddComponent<Animation>();
+                    }
+
+                    AnimationClip newClip = AnimationUtility.CreateAnimationClip(metadata.textureTransforms[0]);
+                    AssetDatabase.CreateAsset(newClip, path + ".anim");
+                    newAnimator.clip = newClip;
+
+                    PrefabUtility.ApplyPrefabInstance(instantiatedGameObject, InteractionMode.UserAction);
+                    PrefabUtility.SavePrefabAsset(prefab);
+                    UnityEngine.Object.DestroyImmediate(instantiatedGameObject);
+                }
             }
         }
 
@@ -48,14 +66,14 @@ namespace WowExportUnityifier
 
             if (!File.Exists(pathToMetadata))
             {
-                return new M2();
+                return null;
             }
 
             var sr = new StreamReader(Application.dataPath.Replace("Assets", "") + pathToMetadata);
             var fileContents = sr.ReadToEnd();
             sr.Close();
 
-            return UnityEngine.JsonUtility.FromJson<M2>(fileContents);
+            return JsonConvert.DeserializeObject<M2>(fileContents);
         }
 
         public static Material GetMaterialData(string materialName, M2 metadata)
@@ -83,7 +101,7 @@ namespace WowExportUnityifier
         }
 
         [Serializable]
-        public struct M2
+        public class M2
         {
             public uint fileDataID;
             public string fileName;
@@ -93,6 +111,8 @@ namespace WowExportUnityifier
             public Material[] materials;
             public short[] textureCombos;
             public ColorData[] colors;
+            public TextureTransform[] textureTransforms;
+            public uint[] textureTransformsLookup;
         }
 
         [Serializable]
@@ -112,26 +132,37 @@ namespace WowExportUnityifier
             public uint blendingMode;
         }
 
+        [Serializable]
         public struct ColorData
         {
-            public Color color;
-            public Alpha alpha;
+            public MultiValueAnimationInformation color;
+            public SingleValueAnimationInformation alpha;
         }
 
-        public struct Color
+        [Serializable]
+        public struct TextureTransform
         {
-            public uint globalSeq;
-            public uint interpolation;
-            public uint[] timestamps;
-            public short[][] values;
+            public MultiValueAnimationInformation translation;
+            public MultiValueAnimationInformation rotation;
+            public MultiValueAnimationInformation scaling;
         }
 
-        public struct Alpha
+        [Serializable]
+        public struct SingleValueAnimationInformation
         {
             public uint globalSeq;
-            public uint interpolation;
-            public uint[] timestamps;
-            public short[] values;
+            public int interpolation;
+            public List<List<uint>> timestamps;
+            public List<List<float>> values;
+        }
+
+        [Serializable]
+        public struct MultiValueAnimationInformation
+        {
+            public uint globalSeq;
+            public int interpolation;
+            public List<List<uint>> timestamps;
+            public List<List<List<float>>> values;
         }
     }
 }

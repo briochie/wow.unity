@@ -116,10 +116,7 @@ namespace WowExportUnityifier
 
         public static void BeginQueue()
         {
-            if (EditorApplication.update != null)
-            {
-                EditorApplication.update -= BeginQueue;
-            }
+            EditorApplication.update -= BeginQueue;
 
             if (queuedPlacementInformationPaths.Count == 0)
             {

@@ -67,15 +67,13 @@ public class WoWExportUnityPostprocessor : AssetPostprocessor
 
     public void OnPreprocessMaterialDescription(MaterialDescription description, Material material, AnimationClip[] materialAnimation)
     {
-        ModelImporter modelImporter = assetImporter as ModelImporter;
-        M2Utility.M2 metadata = M2Utility.ReadMetadataFor(assetPath);
-
         if (!ValidAsset())
         {
             return;
         }
 
-        MaterialUtility.ConfigureMaterial(description, material, assetPath);
+        M2Utility.M2 metadata = M2Utility.ReadMetadataFor(assetPath);
+        MaterialUtility.ConfigureMaterial(description, material, assetPath, metadata);
     }
 
     public void OnPostprocessModel(GameObject gameObject)
@@ -84,8 +82,6 @@ public class WoWExportUnityPostprocessor : AssetPostprocessor
         {
             return;
         }
-
-        M2Utility.QueueMetadata(assetPath);
 
         GameObject physicsPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath.Replace(".obj", ".phys.obj"));
         MeshRenderer[] childRenderers = gameObject.GetComponentsInChildren<MeshRenderer>();
@@ -110,16 +106,15 @@ public class WoWExportUnityPostprocessor : AssetPostprocessor
 
     static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
     {
-        foreach(string path in importedAssets)
+        foreach (string path in importedAssets)
         {
-            if (!Path.GetFileName(path).Contains("_ModelPlacementInformation.csv"))
+            if (Path.GetFileName(path).Contains("_ModelPlacementInformation.csv"))
             {
-                continue;
+                DoodadUtility.QueuePlacementData(path);
             }
-
-            DoodadUtility.QueuePlacementData(path);
         }
 
+        //EditorApplication.update += M2Utility.BeginQueue;
         EditorApplication.update += DoodadUtility.BeginQueue;
     }
 
@@ -131,6 +126,8 @@ public class WoWExportUnityPostprocessor : AssetPostprocessor
         }
 
         ModelImporter modelImporter = assetImporter as ModelImporter;
+        //modelImporter.materialName = ModelImporterMaterialName.BasedOnMaterialName;
+        //modelImporter.materialSearch = ModelImporterMaterialSearch.RecursiveUp;
         modelImporter.SearchAndRemapMaterials(ModelImporterMaterialName.BasedOnMaterialName, ModelImporterMaterialSearch.RecursiveUp);
 
         return null;
