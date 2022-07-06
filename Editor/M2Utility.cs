@@ -19,9 +19,9 @@ namespace WowExportUnityifier
             importedModelPathQueue.Add(filePath);
         }
 
-        public static void BeginQueue()
+        public static void PostProcessImports()
         {
-            EditorApplication.update -= BeginQueue;
+            EditorApplication.update -= PostProcessImports;
 
             if (importedModelPathQueue.Count == 0)
             {
@@ -38,24 +38,13 @@ namespace WowExportUnityifier
                 if (metadata.fileName == null)
                     continue;
 
-                if (metadata.textureTransforms[0].translation.timestamps.Count > 0)
+                if (metadata.textureTransforms.Count > 0 && metadata.textureTransforms[0].translation.timestamps.Count > 0)
                 {
-                    GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-                    GameObject instantiatedGameObject = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-                    Animation newAnimator = instantiatedGameObject.transform.GetChild(0).gameObject.GetComponent<Animation>();
-
-                    if (newAnimator == null)
+                    for (int i = 0; i < metadata.textureTransforms.Count; i++)
                     {
-                        newAnimator = instantiatedGameObject.transform.GetChild(0).gameObject.AddComponent<Animation>();
+                        AnimationClip newClip = AnimationUtility.CreateAnimationClip(metadata.textureTransforms[i]);
+                        AssetDatabase.CreateAsset(newClip, Path.GetDirectoryName(path) + "/" + Path.GetFileNameWithoutExtension(path) + "[" + i +  "]" + ".anim");
                     }
-
-                    AnimationClip newClip = AnimationUtility.CreateAnimationClip(metadata.textureTransforms[0]);
-                    AssetDatabase.CreateAsset(newClip, path + ".anim");
-                    newAnimator.clip = newClip;
-
-                    PrefabUtility.ApplyPrefabInstance(instantiatedGameObject, InteractionMode.UserAction);
-                    PrefabUtility.SavePrefabAsset(prefab);
-                    UnityEngine.Object.DestroyImmediate(instantiatedGameObject);
                 }
             }
         }
@@ -84,14 +73,14 @@ namespace WowExportUnityifier
 
             //I have no idea why they sometimes don't match sizes.
             // I'm guessing if there's no material entry, default is intended.
-            for(int i = 0; i < metadata.textures.Length; i++)
+            for(int i = 0; i < metadata.textures.Count; i++)
             {
                 Texture texture = metadata.textures[i];
                 if (texture.mtlName != materialName)
                     continue;
 
-                if (metadata.materials.Length <= i)
-                    i = metadata.materials.Length - 1;
+                if (metadata.materials.Count <= i)
+                    i = metadata.materials.Count - 1;
                 
                 data = metadata.materials[i];
                 break;
@@ -106,13 +95,35 @@ namespace WowExportUnityifier
             public uint fileDataID;
             public string fileName;
             public string internalName;
-            public Texture[] textures;
-            public short[] textureTypes;
-            public Material[] materials;
-            public short[] textureCombos;
-            public ColorData[] colors;
-            public TextureTransform[] textureTransforms;
-            public uint[] textureTransformsLookup;
+            public Skin skin;
+            public List<Texture> textures = new List<Texture>();
+            public List<short> textureTypes = new List<short>();
+            public List<Material> materials = new List<Material>();
+            public List<short> textureCombos = new List<short>();
+            public List<ColorData> colors = new List<ColorData>();
+            public List<TextureTransform> textureTransforms = new List<TextureTransform>();
+            public List<uint> textureTransformsLookup = new List<uint>();
+        }
+
+        [Serializable]
+        public struct Skin
+        {
+            public SubMesh[] subMeshes;
+            public TextureUnit[] textureUnits;
+        }
+
+        [Serializable]
+        public struct SubMesh
+        {
+            public bool enabled;
+        }
+
+        [Serializable]
+        public struct TextureUnit
+        {
+            public uint skinSelectionIndex;
+            public uint geosetIndex;
+            public uint colorIndex;
         }
 
         [Serializable]

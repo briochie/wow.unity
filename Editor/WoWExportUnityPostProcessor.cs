@@ -20,11 +20,11 @@ public class WoWExportUnityPostprocessor : AssetPostprocessor
         return 1;
     }
 
-    private bool ValidAsset()
+    static private bool ValidAsset(string path)
     {
-        if (!assetPath.Contains(".obj"))
+        if (!path.Contains(".obj"))
             return false;
-        if (assetPath.Contains(".phys.obj"))
+        if (path.Contains(".phys.obj"))
             return false;
 
         return true;
@@ -49,7 +49,7 @@ public class WoWExportUnityPostprocessor : AssetPostprocessor
 
     public void OnPreprocessModel()
     {
-        if (!ValidAsset())
+        if (!ValidAsset(assetPath))
         {
             return;
         }
@@ -67,7 +67,7 @@ public class WoWExportUnityPostprocessor : AssetPostprocessor
 
     public void OnPreprocessMaterialDescription(MaterialDescription description, Material material, AnimationClip[] materialAnimation)
     {
-        if (!ValidAsset())
+        if (!ValidAsset(assetPath))
         {
             return;
         }
@@ -78,7 +78,7 @@ public class WoWExportUnityPostprocessor : AssetPostprocessor
 
     public void OnPostprocessModel(GameObject gameObject)
     {
-        if (!ValidAsset())
+        if (!ValidAsset(assetPath))
         {
             return;
         }
@@ -108,26 +108,31 @@ public class WoWExportUnityPostprocessor : AssetPostprocessor
     {
         foreach (string path in importedAssets)
         {
+            M2Utility.M2 metadata = M2Utility.ReadMetadataFor(path);
+
+            if (ValidAsset(path) && metadata != null)
+            {
+                M2Utility.QueueMetadata(path);
+            }
+
             if (Path.GetFileName(path).Contains("_ModelPlacementInformation.csv"))
             {
                 DoodadUtility.QueuePlacementData(path);
             }
         }
 
-        //EditorApplication.update += M2Utility.BeginQueue;
+        EditorApplication.update += M2Utility.PostProcessImports;
         EditorApplication.update += DoodadUtility.BeginQueue;
     }
 
     private Material OnAssignMaterialModel(Material material, Renderer renderer)
     {
-        if (!ValidAsset() || material.shader.name == MaterialUtility.ADT_CHUNK_SHADER)
+        if (!ValidAsset(assetPath) || material.shader.name == MaterialUtility.ADT_CHUNK_SHADER)
         {
             return null;
         }
 
         ModelImporter modelImporter = assetImporter as ModelImporter;
-        //modelImporter.materialName = ModelImporterMaterialName.BasedOnMaterialName;
-        //modelImporter.materialSearch = ModelImporterMaterialSearch.RecursiveUp;
         modelImporter.SearchAndRemapMaterials(ModelImporterMaterialName.BasedOnMaterialName, ModelImporterMaterialSearch.RecursiveUp);
 
         return null;

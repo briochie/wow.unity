@@ -45,10 +45,10 @@ namespace WowExportUnityifier
 
             M2Utility.Material materialData = M2Utility.GetMaterialData(material.name, metadata);
             Color materialColor = Color.white;
-            //if (metadata != null && metadata.colors.Length > 0)
-            //{
-            //    materialColor = ProcessMaterialColors(material, metadata.colors[0]);
-            //}
+            if (metadata != null && metadata.colors.Count > 0)
+            {
+                materialColor = ProcessMaterialColors(material, metadata.colors[0]);
+            }
             
             material.shader = Shader.Find(LIT_SHADER);
             material.SetColor("_BaseColor", materialColor);
@@ -118,6 +118,7 @@ namespace WowExportUnityifier
                 newColor.r = data.color.values[0][0][0];
                 newColor.g = data.color.values[0][0][1];
                 newColor.b = data.color.values[0][0][2];
+                newColor.a = 1;
             }
 
             return newColor;

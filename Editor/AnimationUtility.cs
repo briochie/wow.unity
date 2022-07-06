@@ -1745,6 +1745,7 @@ namespace WowExportUnityifier
         {
             AnimationClip newClip = new AnimationClip();
             newClip.legacy = true;
+            newClip.wrapMode = WrapMode.Loop;
 
             var curves = new List<AnimationCurve>(new AnimationCurve[] { new AnimationCurve(), new AnimationCurve(), new AnimationCurve() });
             foreach (List<uint> timestamps in textureTransformMetadata.translation.timestamps) {
@@ -1752,15 +1753,14 @@ namespace WowExportUnityifier
                 
                 for (int i = 0; i < timestamps.Count; i++)
                 {
-                    curves[0].AddKey(timestamps[i], values[i][0]);
-                    curves[1].AddKey(timestamps[i], values[i][1]);
-                    curves[2].AddKey(timestamps[i], values[i][2]);
+                    curves[0].AddKey(timestamps[i]/1000f, values[i][0]);
+                    curves[1].AddKey(timestamps[i]/1000f, values[i][1] * -1);
+                    curves[2].AddKey(timestamps[i]/1000f, values[i][2]);
                 }
             }
 
-            newClip.SetCurve("", typeof(Material), "_MainTex.offset.x", curves[0]);
-            newClip.SetCurve("", typeof(Material), "_MainTex.offset.y", curves[1]);
-            newClip.frameRate = 1000;
+            newClip.SetCurve("", typeof(Material), "_BaseMap.offset.x", curves[0]);
+            newClip.SetCurve("", typeof(Material), "_BaseMap.offset.y", curves[1]);
 
             return newClip;
         }
