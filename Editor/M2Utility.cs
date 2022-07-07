@@ -106,10 +106,10 @@ namespace WowExportUnityifier
         }
 
         [Serializable]
-        public struct Skin
+        public class Skin
         {
-            public SubMesh[] subMeshes;
-            public TextureUnit[] textureUnits;
+            public List<SubMesh> subMeshes = new List<SubMesh>();
+            public List<TextureUnit> textureUnits = new List<TextureUnit>();
         }
 
         [Serializable]

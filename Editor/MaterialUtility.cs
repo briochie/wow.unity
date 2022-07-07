@@ -47,7 +47,7 @@ namespace WowExportUnityifier
             Color materialColor = Color.white;
             if (metadata != null && metadata.colors.Count > 0)
             {
-                materialColor = ProcessMaterialColors(material, metadata.colors[0]);
+                materialColor = ProcessMaterialColors(material, metadata);
             }
             
             material.shader = Shader.Find(LIT_SHADER);
@@ -110,14 +110,37 @@ namespace WowExportUnityifier
             }
         }
 
-        public static Color ProcessMaterialColors(Material material, M2Utility.ColorData data)
+        public static Color ProcessMaterialColors(Material material, M2Utility.M2 metadata)
         {
-            Color newColor = new Color();
-            if (data.color.values.Count > 0)
+            int i, j, k;
+            Color newColor = Color.white;
+            if (metadata.skin == null || metadata.skin.textureUnits.Count <= 0)
             {
-                newColor.r = data.color.values[0][0][0];
-                newColor.g = data.color.values[0][0][1];
-                newColor.b = data.color.values[0][0][2];
+                return newColor;
+            }
+
+            for (i = 0; i < metadata.textures.Count; i++)
+            {
+                if (material.name == metadata.textures[i].mtlName)
+                    break;
+            }
+
+            for (j = 0; j < metadata.skin.textureUnits.Count; j++)
+            {
+                if (metadata.skin.textureUnits[j].geosetIndex == i)
+                    break;
+            }
+
+            if (j < metadata.skin.textureUnits.Count)
+                k = (int)metadata.skin.textureUnits[j].colorIndex;
+            else
+                return newColor;
+
+            if (k < metadata.colors.Count)
+            {
+                newColor.r = metadata.colors[k].color.values[0][0][0];
+                newColor.g = metadata.colors[k].color.values[0][0][1];
+                newColor.b = metadata.colors[k].color.values[0][0][2];
                 newColor.a = 1;
             }
 
