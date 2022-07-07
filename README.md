@@ -5,6 +5,14 @@
 
 ## Why use your Unityifier?
 
+Overall, this tool will get you \~80% of the way there when it comes to using wow.export assets in Unity.
+
+Importing assets and their metadata directly from wow.export, this plugin will automatically:
+ - Apply alpha maps and textures to terrain tiles
+ - Set basic shader settings for most objects
+ - Generate texture animations for objects such as flames and waterfalls
+ - Populate WMOs and ADTs with doodads automatically
+
 Typically when working with wow.export, it's much easier to import the exports into blender, and then export that file into Unity, or some other software. That way, your WMO and ADT objects have all their doodads placed. This works for modeling, but with game projects, you may need to add things to those objects, like lighting to your torches, etc.
 
 With the export for blender, you will have to replace every object with one prefab version to save you some work later, or write a script to handle it for you. This tool handles all that for you.
@@ -61,10 +69,11 @@ Here are some quick things you can try that will resolve most problems:
 
 If there are still problems, delete the files exported from wow.export, update wow.export, reexport the files, and try again. If you continue to have problems, feel free to reach out to me on the repo, and I will try to get back to you.
 
-# Hot Upcoming Features
-Next major update, I'm planning to focus on:
+# Upcoming Planned Features
+In the future, I'm planning to look into:
 
- - The Terrain Chunk shader
  - Foliage generation and rendering
- - Overhauling the material import process
  - Render features for billboards (objects meant to face the camera at all times)
+ - Automatically attaching generated animations
+ - Apply armiture to exported models
+ - GLFT imports (when wow.export supports those exports)
