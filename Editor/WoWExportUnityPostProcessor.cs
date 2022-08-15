@@ -106,23 +106,33 @@ public class WoWExportUnityPostprocessor : AssetPostprocessor
 
     static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
     {
-        foreach (string path in importedAssets)
-        {
-            M2Utility.M2 metadata = M2Utility.ReadMetadataFor(path);
+        string path;
 
-            if (ValidAsset(path) && metadata != null)
+        for(int i = 0; i < importedAssets.Length; i++)
+        {
+            path = importedAssets[i];
+
+            //M2 Utility Queue
+            if (ValidAsset(path))
             {
                 M2Utility.QueueMetadata(path);
             }
 
+            //ADT/WMO Item Collection Queue
             if (Path.GetFileName(path).Contains("_ModelPlacementInformation.csv"))
             {
-                DoodadUtility.QueuePlacementData(path);
+                ItemCollectionUtility.QueuePlacementData(path);
+            }
+
+            //ADT Liquid Volume Queue
+            if (Regex.IsMatch(path, @"liquid_\d{2}_\d{2}(?=\.json)"))
+            {
+                LiquidUtility.QueueLiquidData(path);
             }
         }
 
         EditorApplication.update += M2Utility.PostProcessImports;
-        EditorApplication.update += DoodadUtility.BeginQueue;
+        EditorApplication.update += ItemCollectionUtility.BeginQueue;
     }
 
     private Material OnAssignMaterialModel(Material material, Renderer renderer)
@@ -133,7 +143,7 @@ public class WoWExportUnityPostprocessor : AssetPostprocessor
         }
 
         ModelImporter modelImporter = assetImporter as ModelImporter;
-        modelImporter.SearchAndRemapMaterials(ModelImporterMaterialName.BasedOnMaterialName, ModelImporterMaterialSearch.RecursiveUp);
+        //modelImporter.SearchAndRemapMaterials(ModelImporterMaterialName.BasedOnMaterialName, ModelImporterMaterialSearch.RecursiveUp);
 
         return null;
     }

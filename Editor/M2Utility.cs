@@ -32,11 +32,12 @@ namespace WowExportUnityifier
 
             foreach (string path in iteratingList)
             {
-                importedModelPathQueue.Remove(path);
                 M2 metadata = ReadMetadataFor(path);
 
-                if (metadata.fileName == null)
+                if (metadata == null)
                     continue;
+
+                GameObject prefab = FindOrCreatePrefab(path);
 
                 if (metadata.textureTransforms.Count > 0 && metadata.textureTransforms[0].translation.timestamps.Count > 0)
                 {
@@ -46,7 +47,51 @@ namespace WowExportUnityifier
                         AssetDatabase.CreateAsset(newClip, Path.GetDirectoryName(path) + "/" + Path.GetFileNameWithoutExtension(path) + "[" + i +  "]" + ".anim");
                     }
                 }
+
+                //Processing done: remove the path.
+                importedModelPathQueue.Remove(path);
             }
+        }
+
+        public static GameObject FindOrCreatePrefab(string path)
+        {
+            string prefabPath = Path.ChangeExtension(path, "prefab");
+            GameObject existingPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+
+            if (existingPrefab == null)
+            {
+                return GeneratePrefab(path);
+            }
+
+            return existingPrefab;
+        }
+
+        public static GameObject GeneratePrefab(string path)
+        {
+            string prefabPath = Path.ChangeExtension(path, "prefab");
+            GameObject importedModelObject = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+
+            if (importedModelObject == null)
+            {
+                Debug.LogWarning("Tried to create prefab, but could not find imported model: " + path);
+                return null;
+            }
+
+            GameObject rootModelInstance = PrefabUtility.InstantiatePrefab(importedModelObject) as GameObject;
+
+            //Set the object as static, and all it's child objects
+            rootModelInstance.isStatic = true;
+            foreach (Transform childTransform in rootModelInstance.transform)
+            {
+                childTransform.gameObject.isStatic = true;
+            }
+
+            PrefabUtility.UnpackPrefabInstance(rootModelInstance, PrefabUnpackMode.OutermostRoot, InteractionMode.AutomatedAction);
+            GameObject newPrefab = PrefabUtility.SaveAsPrefabAssetAndConnect(rootModelInstance, prefabPath, InteractionMode.AutomatedAction);
+            AssetDatabase.Refresh();
+            UnityEngine.Object.DestroyImmediate(rootModelInstance);
+
+            return newPrefab;
         }
 
         public static M2 ReadMetadataFor(string path)

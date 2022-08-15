@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace WowExportUnityifier
 {
-    public class DoodadUtility
+    public class ItemCollectionUtility
     {
         public static readonly char CSV_LINE_SEPERATOR = '\n';
         public static readonly char CSV_COLUMN_SEPERATOR = ';';
@@ -25,9 +25,15 @@ namespace WowExportUnityifier
             return Regex.IsMatch(modelPlacementInformation.name, @"adt_\d{2}_\d{2}");
         }
 
-        public static void Generate(GameObject prefab, TextAsset modelPlacementInformation)
+        public static void GenerateADT(GameObject prefab, TextAsset modelPlacementInformation)
         {
             GameObject instantiatedGameObject = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            instantiatedGameObject.isStatic = true;
+            foreach (Transform childTransform in instantiatedGameObject.transform)
+            {
+                childTransform.gameObject.isStatic = true;
+            }
+
             string path = AssetDatabase.GetAssetPath(prefab);
 
             ParseFileAndSpawnDoodads(instantiatedGameObject, modelPlacementInformation);
@@ -36,11 +42,12 @@ namespace WowExportUnityifier
 
             if (Path.GetExtension(parentPath) == ".prefab")
             {
-                PrefabUtility.ApplyPrefabInstance(instantiatedGameObject, InteractionMode.UserAction);
+                PrefabUtility.ApplyPrefabInstance(instantiatedGameObject, InteractionMode.AutomatedAction);
                 PrefabUtility.SavePrefabAsset(prefab);
             }
             else
             {
+                PrefabUtility.UnpackPrefabInstance(instantiatedGameObject, PrefabUnpackMode.OutermostRoot, InteractionMode.AutomatedAction);
                 PrefabUtility.SaveAsPrefabAsset(instantiatedGameObject, parentPath.Replace(Path.GetExtension(parentPath), ".prefab"));
             }
 
@@ -82,24 +89,12 @@ namespace WowExportUnityifier
 
         private static void SpawnDoodad(string path, Vector3 position, Quaternion rotation, float scaleFactor, Transform parent)
         {
-            string prefabPath = Path.ChangeExtension(path, "prefab");
-            GameObject exisitingPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
-
+            GameObject exisitingPrefab = M2Utility.FindOrCreatePrefab(path);
 
             if (exisitingPrefab == null)
             {
-                GameObject importedModelRoot = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-
-                if (importedModelRoot == null)
-                {
-                    missingFilesInQueue.Add(path);
-                    return;
-                }
-
-                GameObject rootModelInstance = PrefabUtility.InstantiatePrefab(importedModelRoot) as GameObject;
-                exisitingPrefab = PrefabUtility.SaveAsPrefabAssetAndConnect(rootModelInstance, prefabPath, InteractionMode.AutomatedAction);
-                AssetDatabase.Refresh();
-                Object.DestroyImmediate(rootModelInstance);
+                Debug.LogWarning("Object was not spawned because it could not be found: " + path);
+                return;
             }
 
             GameObject newDoodadInstance = PrefabUtility.InstantiatePrefab(exisitingPrefab, parent) as GameObject;
@@ -127,11 +122,12 @@ namespace WowExportUnityifier
 
             foreach (string path in iteratingList)
             {
-                queuedPlacementInformationPaths.Remove(path);
                 TextAsset placementData = AssetDatabase.LoadAssetAtPath<TextAsset>(path);
                 string prefabPath = Path.GetDirectoryName(path) + "\\" + Path.GetFileName(path).Replace("_ModelPlacementInformation.csv", ".obj");
                 GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
-                DoodadUtility.Generate(prefab, placementData);
+                GenerateADT(prefab, placementData);
+
+                queuedPlacementInformationPaths.Remove(path);
             }
 
             foreach (string missingFilePath in missingFilesInQueue)

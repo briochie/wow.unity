@@ -62,7 +62,7 @@ namespace WowExportUnityifier
             }
                 
             ProcessFlagsForMaterial(material, materialData);
-            CreateMaterialAsset(material);
+            //CreateMaterialAsset(material);
             return material;
         }
 
