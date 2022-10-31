@@ -86,7 +86,6 @@ namespace WowExportUnityifier
                 childTransform.gameObject.isStatic = true;
             }
 
-            PrefabUtility.UnpackPrefabInstance(rootModelInstance, PrefabUnpackMode.OutermostRoot, InteractionMode.AutomatedAction);
             GameObject newPrefab = PrefabUtility.SaveAsPrefabAssetAndConnect(rootModelInstance, prefabPath, InteractionMode.AutomatedAction);
             AssetDatabase.Refresh();
             UnityEngine.Object.DestroyImmediate(rootModelInstance);
