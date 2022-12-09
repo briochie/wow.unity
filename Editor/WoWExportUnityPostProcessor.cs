@@ -143,7 +143,7 @@ public class WoWExportUnityPostprocessor : AssetPostprocessor
         }
 
         ModelImporter modelImporter = assetImporter as ModelImporter;
-        //modelImporter.SearchAndRemapMaterials(ModelImporterMaterialName.BasedOnMaterialName, ModelImporterMaterialSearch.RecursiveUp);
+        modelImporter.SearchAndRemapMaterials(ModelImporterMaterialName.BasedOnMaterialName, ModelImporterMaterialSearch.RecursiveUp);
 
         return null;
     }

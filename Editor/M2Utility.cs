@@ -47,10 +47,10 @@ namespace WowExportUnityifier
                         AssetDatabase.CreateAsset(newClip, Path.GetDirectoryName(path) + "/" + Path.GetFileNameWithoutExtension(path) + "[" + i +  "]" + ".anim");
                     }
                 }
-
-                //Processing done: remove the path.
-                importedModelPathQueue.Remove(path);
             }
+
+            //Processing done: remove all paths from the queue
+            importedModelPathQueue.Clear();
         }
 
         public static GameObject FindOrCreatePrefab(string path)

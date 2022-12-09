@@ -47,7 +47,6 @@ namespace WowExportUnityifier
             }
             else
             {
-                PrefabUtility.UnpackPrefabInstance(instantiatedGameObject, PrefabUnpackMode.OutermostRoot, InteractionMode.AutomatedAction);
                 PrefabUtility.SaveAsPrefabAsset(instantiatedGameObject, parentPath.Replace(Path.GetExtension(parentPath), ".prefab"));
             }
 

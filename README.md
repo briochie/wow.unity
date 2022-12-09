@@ -1,9 +1,11 @@
 # wow.export Unityifier
 
-**wow.export Unityifier** is a collection of shaders, asset postprocessors, and other tools aimed to make working with wow.export's exports fast and easy in Unity. With just a drag and drop, things like prefabs, alpha maps, and doodad generation are handled for you.
+**wow.export Unityifier** is a collection of shaders, asset postprocessors, and other tools aimed to make working with wow.export's exports fast and easy in Unity's URP Pipeline. With the click of a button, you will have a library of models and prefabs ready to drop directly into your scenes.
 
 
 ## Why use your Unityifier?
+
+Normally, you would need to handle a lot of the heavy lifting yourself. You would need to figure out how to parse the metadata provided from wow.export manually, which most importantly includes doodad placements.
 
 Overall, this tool will get you \~80% of the way there when it comes to using wow.export assets in Unity.
 
@@ -11,13 +13,12 @@ Importing assets and their metadata directly from wow.export, this plugin will a
  - Apply alpha maps and textures to terrain tiles
  - Set basic shader settings for most objects
  - Generate texture animations for objects such as flames and waterfalls
- - Populate WMOs and ADTs with doodads automatically
+ - Populate WMOs and ADTs with doodads automatically and turn these into prefabs
+ - Create prefab/prefab variants for easy editing
 
-Typically when working with wow.export, it's much easier to import the exports into blender, and then export that file into Unity, or some other software. That way, your WMO and ADT objects have all their doodads placed. This works for modeling, but with game projects, you may need to add things to those objects, like lighting to your torches, etc.
+## How does it work?
 
-With the export for blender, you will have to replace every object with one prefab version to save you some work later, or write a script to handle it for you. This tool handles all that for you.
-
-This package will create prefab variants for each doodad, allowing you to do things like add lights to all street lamps at once, make normally non-interactive objects carry some game logic, etc. Do it once and it will update every instance of that object in your project. Magic.
+This package uses an asset postprocessor to automatically detect potential wow.export imports and configure those objects to more closely resemble their in-game counterparts. This means it all happens automatically - no need for any additional tools or button presses.
 
 ## Support wow.export on Patreon
 wow.export is an amazing tool, created and maintained by Kruithne. Please, do me (and yourself!) a favor and check out these links, and support Kruithne on [Patreon](https://www.patreon.com/kruithne):
@@ -36,44 +37,46 @@ You will require the following to use this package:
  - Unity 2021.1 or greater
  - Universal Render Pipeline (URP) 12.0 or greater
 
-## Importing Your Assets
+## Using this Package in a New Project
 
-The whole idea of this plugin is to make things simple: one import process, and you can get started working on your scenes. This is the process from start to finish:
+If you're starting from scratch, it's never been easier to get started with wow.export in Unity:
 
- 1. Create an empty directory for wow.export to export to. (Optional, but recommended)
- 2. Configure wow.export to export to that directory, and export all the assets you need.
- 3. With your project open in Unity, drag the **entire** export folder into the project panel.
- 4. Wait.
+ 1. Create a new Unity project using the 3D (URP) template.
+ 2. [Install this package using the package manager.](https://docs.unity3d.com/Manual/upm-ui-giturl.html)
+ 3. Create a folder in your project to place your wow.export assets (eg: 'Assets/wow.export/').
+ 4. Open wow.export.
+ 5. Configure wow.export to export directly to the folder you created in the previous step.
+ 6. Begin exporting your assets.
 
-After some time (can be as much as an hour on slow machines, or if you export a lot of assets), presto! All your ADTs, WMOs, and their doodads are turned into prefabs!
+## Using this Package in an Existing URP Project
+
+If you have already started a project and want to use this package, you will need to do the following:
+
+ 1. Follow steps 2-5 above.
+ 2. Reimport any existing wow.export assets in the project.
+
+It's that easy.
 
 ## Using the Imports
 
-As mentioned, we don't edit the models themselves, outside of manipulating the materials. Each ADT, WMO, and any doodads inside them have had a prefab variant created in the same directory, with the same name as the original object file.
-
-To use the fully populated version of the ADT or WMO, simple drag the prefab variant into your scene.
+To use the fully populated version of the ADT or WMO, simple drag the prefab variant into your scene. Doodads are likewise saved as prefabs, and can be simply dragged and dropped.
 
 ## What about textures/materials?
 
-Textures are left in their original folders. New materials are created for each texture, and those materials are placed in a folder in your project's Asset folder.
+Textures are left in their original folders. New materials are created for each object, and those materials are placed in a folder in your project's Asset folder.
 
 You can find those files at `Assets/Materials/`.
 
-ADTs are automatically set up to use the current version of the terrain chunk shader, provided with the package. Updates to make the shader more game accurate (aka: correct) will be my next project, along with more accurate initial shaders.
+## What about terrain?
+
+ADTs are automatically set up to use the current version of the terrain chunk shader, provided with the package. As of now, the shader is accurate and working for pre-Warlords of Draenor maps. It will not be 100% accurate to the game, however, until Unity supports better sampling options.
+
+Currently, the terrain implementation does not use Unity's terrain, and instead uses simple obj files for the meshes. Using occlusion culling, these tiles are quite performant.
 
 ## Uh oh, I've run into a problem...
 Here are some quick things you can try that will resolve most problems:
 
- 1. Delete the entire wow.export folder used to import the models from Unity.
- 2. Reimport the files again, as you did before.
+ 1. Delete any existing files that were added to the project prior to installing the package.
+ 2. Reimport them using the steps above under Using this Package in an Existing URP Project.
 
-If there are still problems, delete the files exported from wow.export, update wow.export, reexport the files, and try again. If you continue to have problems, feel free to reach out to me on the repo, and I will try to get back to you.
-
-# Upcoming Planned Features
-In the future, I'm planning to look into:
-
- - Foliage generation and rendering
- - Render features for billboards (objects meant to face the camera at all times)
- - Automatically attaching generated animations
- - Apply armiture to exported models
- - GLFT imports (when wow.export supports those exports)
+If you continue to have problems, feel free to reach out to me on the repo, or on the wow.export Discord server, and I will try to get back to you.
