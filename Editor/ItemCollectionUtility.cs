@@ -63,8 +63,8 @@ namespace WowExportUnityifier
                 doodadPath = Path.GetFullPath(doodadPath);
                 doodadPath = "Assets\\" + doodadPath.Substring(Application.dataPath.Length + 1); //This is so nifty :3
 
-                Vector3 doodadPosition = new Vector3(float.Parse(fields[1]) * -1, float.Parse(fields[3]), float.Parse(fields[2]) * -1);
-                Quaternion doodadRotation = new Quaternion(float.Parse(fields[5]) * -1, float.Parse(fields[7]), float.Parse(fields[6]) * -1, float.Parse(fields[4]) * -1);
+                Vector3 doodadPosition = Vector3.zero;
+                Quaternion doodadRotation = Quaternion.identity;
                 float doodadScale = float.Parse(fields[8]);
 
                 if (isADT(modelPlacementInformation))
@@ -80,6 +80,11 @@ namespace WowExportUnityifier
                     eulerRotation.z = float.Parse(fields[4]);
 
                     doodadRotation.eulerAngles = eulerRotation;
+                }
+                else
+                {
+                    doodadPosition = new Vector3(float.Parse(fields[1]) * -1, float.Parse(fields[3]), float.Parse(fields[2]) * -1);
+                    doodadRotation = new Quaternion(float.Parse(fields[5]) * -1, float.Parse(fields[7]), float.Parse(fields[6]) * -1, float.Parse(fields[4]) * -1);
                 }
 
                 SpawnDoodad(doodadPath, doodadPosition, doodadRotation, doodadScale, instantiatedPrefabGObj.transform);

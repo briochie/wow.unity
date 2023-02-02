@@ -134,17 +134,4 @@ public class WoWExportUnityPostprocessor : AssetPostprocessor
         EditorApplication.update += M2Utility.PostProcessImports;
         EditorApplication.update += ItemCollectionUtility.BeginQueue;
     }
-
-    private Material OnAssignMaterialModel(Material material, Renderer renderer)
-    {
-        if (!ValidAsset(assetPath) || material.shader.name == MaterialUtility.ADT_CHUNK_SHADER)
-        {
-            return null;
-        }
-
-        ModelImporter modelImporter = assetImporter as ModelImporter;
-        modelImporter.SearchAndRemapMaterials(ModelImporterMaterialName.BasedOnMaterialName, ModelImporterMaterialSearch.RecursiveUp);
-
-        return null;
-    }
 }

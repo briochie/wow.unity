@@ -77,6 +77,10 @@ namespace WowExportUnityifier
                 return null;
             }
 
+            //Manage materials for imported models.
+            ModelImporter modelImporter = ModelImporter.GetAtPath(path) as ModelImporter;
+            modelImporter.SearchAndRemapMaterials(ModelImporterMaterialName.BasedOnMaterialName, ModelImporterMaterialSearch.RecursiveUp);
+
             GameObject rootModelInstance = PrefabUtility.InstantiatePrefab(importedModelObject) as GameObject;
 
             //Set the object as static, and all it's child objects
