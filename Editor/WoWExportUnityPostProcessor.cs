@@ -6,7 +6,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Linq;
 using System;
-using WowExportUnityifier;
+using WowUnity;
 
 public class WoWExportUnityPostprocessor : AssetPostprocessor
 {
@@ -73,7 +73,7 @@ public class WoWExportUnityPostprocessor : AssetPostprocessor
         }
 
         M2Utility.M2 metadata = M2Utility.ReadMetadataFor(assetPath);
-        MaterialUtility.ConfigureMaterial(description, material, assetPath, metadata);
+        material = MaterialUtility.ConfigureMaterial(description, material, assetPath, metadata);
     }
 
     public void OnPostprocessModel(GameObject gameObject)
@@ -131,7 +131,6 @@ public class WoWExportUnityPostprocessor : AssetPostprocessor
             }
         }
 
-        EditorApplication.update += M2Utility.PostProcessImports;
-        EditorApplication.update += ItemCollectionUtility.BeginQueue;
+        EditorApplication.update += AssetConversionManager.ProcessAssets;
     }
 }

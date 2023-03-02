@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
-namespace WowExportUnityifier
+namespace WowUnity
 {
     class AnimationUtility
     {

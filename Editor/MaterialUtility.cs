@@ -9,7 +9,7 @@ using UnityEditor;
 using UnityEditor.AssetImporters;
 using UnityEngine;
 
-namespace WowExportUnityifier
+namespace WowUnity
 {
     class MaterialUtility
     {
@@ -62,7 +62,6 @@ namespace WowExportUnityifier
             }
                 
             ProcessFlagsForMaterial(material, materialData);
-            CreateMaterialAsset(material);
             return material;
         }
 
@@ -188,19 +187,32 @@ namespace WowExportUnityifier
             mat.SetVector("Scale", scaleVector);
         }
 
-        public static void CreateMaterialAsset(Material material)
+        public static void ExtractMaterialFromAsset(Material material)
         {
-            string path = "Assets/Materials/" + material.name + ".mat";
+            string assetPath = AssetDatabase.GetAssetPath(material);
+            string newMaterialPath = "Assets/Materials/" + material.name + ".mat";
+            Material newMaterialAsset;
 
             if (!Directory.Exists("Assets/Materials"))
             {
                 Directory.CreateDirectory("Assets/Materials");
             }
-
-            if (!File.Exists(path))
+            
+            if (!File.Exists(newMaterialPath))
             {
-                AssetDatabase.CreateAsset(material, path);
+                newMaterialAsset = new Material(material);
+                AssetDatabase.CreateAsset(newMaterialAsset, newMaterialPath);
             }
+            else
+            {
+                newMaterialAsset = AssetDatabase.LoadAssetAtPath<Material>(newMaterialPath);
+            }
+
+            AssetImporter importer = AssetImporter.GetAtPath(assetPath);
+            importer.AddRemap(new AssetImporter.SourceAssetIdentifier(material), newMaterialAsset);
+
+            AssetDatabase.WriteImportSettingsIfDirty(assetPath);
+            AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceUpdate);
         }
     }
 }

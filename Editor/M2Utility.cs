@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
-namespace WowExportUnityifier
+namespace WowUnity
 {
     class M2Utility
     {
@@ -21,8 +21,6 @@ namespace WowExportUnityifier
 
         public static void PostProcessImports()
         {
-            EditorApplication.update -= PostProcessImports;
-
             if (importedModelPathQueue.Count == 0)
             {
                 return;
@@ -77,7 +75,8 @@ namespace WowExportUnityifier
                 return null;
             }
 
-            //Manage materials for imported models.
+            ConfigureRendererMaterials(importedModelObject);
+
             ModelImporter modelImporter = ModelImporter.GetAtPath(path) as ModelImporter;
             modelImporter.SearchAndRemapMaterials(ModelImporterMaterialName.BasedOnMaterialName, ModelImporterMaterialSearch.RecursiveUp);
 
@@ -95,6 +94,27 @@ namespace WowExportUnityifier
             UnityEngine.Object.DestroyImmediate(rootModelInstance);
 
             return newPrefab;
+        }
+
+        private static void ConfigureRendererMaterials(GameObject importedModelObject)
+        {
+            //Manage materials for imported models.
+
+            //First, we need to sample all renderers that belong to the specified game object.
+            Renderer[] renderers = importedModelObject.GetComponentsInChildren<Renderer>();
+
+            //Now we will loop through all renderers present in the game object
+            //and call the MaterialUtility to create the asset.
+            for (int rendererIndex = 0; rendererIndex < renderers.Length; rendererIndex++)
+            {
+                for (int materialIndex = 0; materialIndex < renderers[rendererIndex].sharedMaterials.Length; materialIndex++)
+                {
+                    //We don't need to worry about repeat materials here,
+                    //because the CreateMaterialAsset already handles this case for us.
+                    MaterialUtility.ExtractMaterialFromAsset(renderers[rendererIndex].sharedMaterials[materialIndex]);
+                }
+            }
+            AssetDatabase.Refresh();
         }
 
         public static M2 ReadMetadataFor(string path)

@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace WowExportUnityifier
+namespace WowUnity
 {
     public class ItemCollectionUtility
     {
@@ -115,8 +115,6 @@ namespace WowExportUnityifier
 
         public static void BeginQueue()
         {
-            EditorApplication.update -= BeginQueue;
-
             if (queuedPlacementInformationPaths.Count == 0)
             {
                 return;
