@@ -55,6 +55,7 @@ public class WoWExportUnityPostprocessor : AssetPostprocessor
         }
 
         ModelImporter modelImporter = assetImporter as ModelImporter;
+        modelImporter.bakeAxisConversion = true;
         modelImporter.generateSecondaryUV = true;
         modelImporter.secondaryUVMarginMethod = ModelImporterSecondaryUVMarginMethod.Calculate;
         modelImporter.secondaryUVMinLightmapResolution = 16;

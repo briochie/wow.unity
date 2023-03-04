@@ -70,8 +70,8 @@ namespace WowUnity
                 if (isADT(modelPlacementInformation))
                 {
 
-                    doodadPosition.x = (MAXIMUM_DISTANCE_FROM_ORIGIN - float.Parse(fields[1])) * -1;
-                    doodadPosition.z = MAXIMUM_DISTANCE_FROM_ORIGIN - float.Parse(fields[3]);
+                    doodadPosition.x = MAXIMUM_DISTANCE_FROM_ORIGIN - float.Parse(fields[1]);
+                    doodadPosition.z = (MAXIMUM_DISTANCE_FROM_ORIGIN - float.Parse(fields[3])) * -1f;
                     doodadPosition.y = float.Parse(fields[2]);
 
                     Vector3 eulerRotation = Vector3.zero;
@@ -83,7 +83,7 @@ namespace WowUnity
                 }
                 else
                 {
-                    doodadPosition = new Vector3(float.Parse(fields[1]) * -1, float.Parse(fields[3]), float.Parse(fields[2]) * -1);
+                    doodadPosition = new Vector3(float.Parse(fields[1]), float.Parse(fields[3]), float.Parse(fields[2]));
                     doodadRotation = new Quaternion(float.Parse(fields[5]) * -1, float.Parse(fields[7]), float.Parse(fields[6]) * -1, float.Parse(fields[4]) * -1);
                 }
 

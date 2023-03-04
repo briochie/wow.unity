@@ -16,7 +16,7 @@ namespace WowUnity
         public const string LIT_SHADER = "Universal Render Pipeline/Simple Lit";
         public const string UNLIT_SHADER = "Universal Render Pipeline/Unlit";
         public const string EFFECT_SHADER = "Universal Render Pipeline/Particles/Unlit";
-        public const string ADT_CHUNK_SHADER = "wow.export Unityifier/TerrainChunk";
+        public const string ADT_CHUNK_SHADER = "wow.unity/TerrainChunk";
 
         public enum MaterialFlags : short
         {

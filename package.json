@@ -1,6 +1,6 @@
 {
   "name": "wow-export-unityifier.briochie",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "description": "A set of shaders, asset postprocessors, and other tools aimed to make working with wow.export and it's exports fast and easy with Unity. With just a drag and drop, things like prefabs, alpha maps, and doodad generation are handled for you.",
   "displayName": "wow.unity",
   "unity": "2021.1",
