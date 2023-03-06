@@ -37,6 +37,11 @@ namespace WowUnity
 
                 GameObject prefab = FindOrCreatePrefab(path);
 
+                if (metadata.boneData != null)
+                {
+                    GenerateBoneData(prefab, metadata);
+                }
+
                 if (metadata.textureTransforms.Count > 0 && metadata.textureTransforms[0].translation.timestamps.Count > 0)
                 {
                     for (int i = 0; i < metadata.textureTransforms.Count; i++)
@@ -77,9 +82,6 @@ namespace WowUnity
 
             ConfigureRendererMaterials(importedModelObject);
 
-            ModelImporter modelImporter = ModelImporter.GetAtPath(path) as ModelImporter;
-            modelImporter.SearchAndRemapMaterials(ModelImporterMaterialName.BasedOnMaterialName, ModelImporterMaterialSearch.RecursiveUp);
-
             GameObject rootModelInstance = PrefabUtility.InstantiatePrefab(importedModelObject) as GameObject;
 
             //Set the object as static, and all it's child objects
@@ -119,7 +121,12 @@ namespace WowUnity
 
         public static M2 ReadMetadataFor(string path)
         {
+            M2 newMetadata = new M2();
+            BoneData newBoneData = new BoneData();
             string pathToMetadata = Path.GetDirectoryName(path) + "/" + Path.GetFileNameWithoutExtension(path) + ".json";
+            string pathToBoneMetadata = Path.GetDirectoryName(path) + "/" + Path.GetFileNameWithoutExtension(path) + "_bones.json";
+
+            JsonSerializerSettings settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
 
             if (!File.Exists(pathToMetadata))
             {
@@ -129,8 +136,18 @@ namespace WowUnity
             var sr = new StreamReader(Application.dataPath.Replace("Assets", "") + pathToMetadata);
             var fileContents = sr.ReadToEnd();
             sr.Close();
+            newMetadata = JsonConvert.DeserializeObject<M2>(fileContents, settings);
 
-            return JsonConvert.DeserializeObject<M2>(fileContents);
+            if (File.Exists(pathToBoneMetadata))
+            {
+                var bsr = new StreamReader(Application.dataPath.Replace("Assets", "") + pathToBoneMetadata);
+                var boneFileContents = bsr.ReadToEnd();
+                newBoneData = JsonConvert.DeserializeObject<BoneData>(boneFileContents, settings);
+                bsr.Close();
+                newMetadata.boneData = newBoneData;
+            }
+
+            return newMetadata;
         }
 
         public static Material GetMaterialData(string materialName, M2 metadata)
@@ -157,6 +174,75 @@ namespace WowUnity
             return data;
         }
 
+        public static void GenerateBoneData(GameObject prefab, M2 metadata)
+        {
+            GameObject gameObject = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
+            MeshFilter[] meshFilters = gameObject.GetComponentsInChildren<MeshFilter>();
+
+            //No renderers? No meshes? Unlikely, but
+            if (renderers.Length == 0 || meshFilters.Length == 0)
+            {
+                return;
+            }
+
+            GameObject armitureObject = new GameObject("Armiture");
+            List<Transform> bones = new List<Transform>();
+            armitureObject.transform.parent = gameObject.transform;
+
+            for (int i = 0; i < metadata.boneData.bones.Count; i++)
+            {
+                Bone boneData = metadata.boneData.bones[i];
+                GameObject newBone = new GameObject("Bone " + i);
+                if (boneData.parentBone > -1)
+                {
+                    //TODO:
+                    //Find the parent bone,
+                    //set the bone as a child of the parent.
+                }
+                else
+                {
+                    newBone.transform.parent = armitureObject.transform;
+                }
+
+                Vector3 bonePivotPosition = new Vector3();
+                bonePivotPosition.x = boneData.pivot[0];
+                bonePivotPosition.y = boneData.pivot[2];
+                bonePivotPosition.z = boneData.pivot[1];
+
+                newBone.transform.localPosition = bonePivotPosition;
+                bones.Add(newBone.transform);
+            }
+
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                //Making an assumption that each geoset
+                //will correlate to each "submesh" in the
+                //m2 metadata.
+                Renderer currentRenderer = renderers[i];
+                SubMesh currentSubMeshData = metadata.skin.subMeshes[i];
+                Mesh currentMesh = meshFilters[i].sharedMesh;
+                SkinnedMeshRenderer newSkinnedMeshRenderer = currentRenderer.gameObject.AddComponent<SkinnedMeshRenderer>();
+                newSkinnedMeshRenderer.rootBone = armitureObject.transform;
+                newSkinnedMeshRenderer.bones = bones.ToArray();
+
+                for (int j = 0; j < currentMesh.vertexCount; j++)
+                {
+                    List<BoneWeight1> newWeights = new List<BoneWeight1>();
+                    for(int k = 0; k < currentSubMeshData.boneInfluences; k++)
+                    {
+                        BoneWeight1 newWeight = new BoneWeight1();
+                        newWeight.boneIndex = (int)currentSubMeshData.centerBoneIndex;
+                        newWeight.weight = 1;
+                    }
+                }
+            }
+
+            PrefabUtility.ApplyPrefabInstance(gameObject, InteractionMode.AutomatedAction);
+            UnityEngine.Object.DestroyImmediate(gameObject);
+            bones.Clear();
+        }
+
         [Serializable]
         public class M2
         {
@@ -164,6 +250,7 @@ namespace WowUnity
             public string fileName;
             public string internalName;
             public Skin skin;
+            public BoneData boneData;
             public List<Texture> textures = new List<Texture>();
             public List<short> textureTypes = new List<short>();
             public List<Material> materials = new List<Material>();
@@ -184,6 +271,19 @@ namespace WowUnity
         public struct SubMesh
         {
             public bool enabled;
+            public uint submeshID;
+            public uint level;
+            public uint vertexStart;
+            public uint vertexCount;
+            public uint triangleStart;
+            public uint triangleCount;
+            public uint boneCount;
+            public uint boneStart;
+            public uint boneInfluences;
+            public uint centerBoneIndex;
+            public List<float> centerPosition;
+            public List<float> sortCenterPosition;
+            public float sortRadius;
         }
 
         [Serializable]
@@ -242,6 +342,28 @@ namespace WowUnity
             public int interpolation;
             public List<List<uint>> timestamps;
             public List<List<List<float>>> values;
+        }
+
+        [Serializable]
+        public struct Bone
+        {
+            public uint flags;
+            public int boneID;
+            public int parentBone;
+            public int subMeshID;
+            public long boneNameCRC;
+            public MultiValueAnimationInformation translation;
+            public MultiValueAnimationInformation rotation;
+            public MultiValueAnimationInformation scale;
+            public List<float> pivot;
+        }
+
+        [Serializable]
+        public class BoneData
+        {
+            public List<Bone> bones;
+            public List<uint?> boneWeights;
+            public List<uint?> boneIndicies;
         }
     }
 }

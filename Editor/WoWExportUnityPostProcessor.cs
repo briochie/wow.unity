@@ -64,6 +64,12 @@ public class WoWExportUnityPostprocessor : AssetPostprocessor
         modelImporter.materialImportMode = ModelImporterMaterialImportMode.ImportViaMaterialDescription;
         modelImporter.materialName = ModelImporterMaterialName.BasedOnMaterialName;
         modelImporter.materialSearch = ModelImporterMaterialSearch.RecursiveUp;
+
+        /*modelImporter.optimizeBones = false;
+        modelImporter.optimizeMeshPolygons = false;
+        modelImporter.optimizeMeshVertices = false;
+        modelImporter.weldVertices = false;
+        modelImporter.meshCompression = ModelImporterMeshCompression.Off;*/
     }
 
     public void OnPreprocessMaterialDescription(MaterialDescription description, Material material, AnimationClip[] materialAnimation)
