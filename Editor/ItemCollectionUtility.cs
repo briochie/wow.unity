@@ -66,34 +66,34 @@ namespace WowUnity
 
                 Vector3 doodadPosition = Vector3.zero;
                 Quaternion doodadRotation = Quaternion.identity;
-                float doodadScale = float.Parse(fields[8], CultureInfo.InvariantCulture);
+                float doodadScale = float.Parse(fields[8]);
 
                 if (isADT(modelPlacementInformation))
                 {
 
-                    doodadPosition.x = MAXIMUM_DISTANCE_FROM_ORIGIN - float.Parse(fields[1], CultureInfo.InvariantCulture);
-                    doodadPosition.z = (MAXIMUM_DISTANCE_FROM_ORIGIN - float.Parse(fields[3], CultureInfo.InvariantCulture)) * -1f;
-                    doodadPosition.y = float.Parse(fields[2], CultureInfo.InvariantCulture);
+                    doodadPosition.x = MAXIMUM_DISTANCE_FROM_ORIGIN - float.Parse(fields[1]);
+                    doodadPosition.z = (MAXIMUM_DISTANCE_FROM_ORIGIN - float.Parse(fields[3])) * -1f;
+                    doodadPosition.y = float.Parse(fields[2]);
 
                     Vector3 eulerRotation = Vector3.zero;
-                    eulerRotation.x = float.Parse(fields[6], CultureInfo.InvariantCulture)) * -1;
-                    eulerRotation.y = float.Parse(fields[5], CultureInfo.InvariantCulture) * -1 - 90;
-                    eulerRotation.z = float.Parse(fields[4], CultureInfo.InvariantCulture)) * -1;
+                    eulerRotation.x = float.Parse(fields[6]) * -1;
+                    eulerRotation.y = float.Parse(fields[5]) * -1 - 90;
+                    eulerRotation.z = float.Parse(fields[4]) * -1;
 
                     doodadRotation.eulerAngles = eulerRotation;
                 }
                 else
                 {
                     doodadPosition = new Vector3(
-                        float.Parse(fields[1], CultureInfo.InvariantCulture), 
-                        float.Parse(fields[3], CultureInfo.InvariantCulture), 
-                        float.Parse(fields[2], CultureInfo.InvariantCulture)
+                        float.Parse(fields[1]), 
+                        float.Parse(fields[3]), 
+                        float.Parse(fields[2])
                     );
                     doodadRotation = new Quaternion(
-                        float.Parse(fields[5], CultureInfo.InvariantCulture) * -1, 
-                        float.Parse(fields[7], CultureInfo.InvariantCulture), 
-                        float.Parse(fields[6], CultureInfo.InvariantCulture) * -1, 
-                        float.Parse(fields[4], CultureInfo.InvariantCulture) * -1
+                        float.Parse(fields[5]) * -1, 
+                        float.Parse(fields[7]), 
+                        float.Parse(fields[6]) * -1, 
+                        float.Parse(fields[4]) * -1
                     );
                 }
 
