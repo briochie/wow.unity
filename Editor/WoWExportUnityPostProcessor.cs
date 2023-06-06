@@ -40,6 +40,7 @@ public class WoWExportUnityPostprocessor : AssetPostprocessor
         }
 
         TextureImporter textureImporter = (TextureImporter)assetImporter;
+        textureImporter.textureType = TextureImporterType.Default;
         textureImporter.wrapMode = TextureWrapMode.Clamp;
         textureImporter.textureCompression = TextureImporterCompression.Uncompressed;
         textureImporter.filterMode = FilterMode.Bilinear;
