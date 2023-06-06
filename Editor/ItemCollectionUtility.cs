@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
@@ -84,17 +83,8 @@ namespace WowUnity
                 }
                 else
                 {
-                    doodadPosition = new Vector3(
-                        float.Parse(fields[1]), 
-                        float.Parse(fields[3]), 
-                        float.Parse(fields[2])
-                    );
-                    doodadRotation = new Quaternion(
-                        float.Parse(fields[5]) * -1, 
-                        float.Parse(fields[7]), 
-                        float.Parse(fields[6]) * -1, 
-                        float.Parse(fields[4]) * -1
-                    );
+                    doodadPosition = new Vector3(float.Parse(fields[1]), float.Parse(fields[3]), float.Parse(fields[2]));
+                    doodadRotation = new Quaternion(float.Parse(fields[5]) * -1, float.Parse(fields[7]), float.Parse(fields[6]) * -1, float.Parse(fields[4]) * -1);
                 }
 
                 SpawnDoodad(doodadPath, doodadPosition, doodadRotation, doodadScale, instantiatedPrefabGObj.transform);
