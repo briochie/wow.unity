@@ -60,9 +60,9 @@ namespace WowUnity
             foreach (string record in records.Skip(1))
             {
                 string[] fields = record.Split(CSV_COLUMN_SEPERATOR);
-                string doodadPath = Path.GetDirectoryName(PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(instantiatedPrefabGObj)) + "\\" + fields[0];
+                string doodadPath = Path.GetDirectoryName(PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(instantiatedPrefabGObj)) + Path.DirectorySeparatorChar + fields[0];
                 doodadPath = Path.GetFullPath(doodadPath);
-                doodadPath = "Assets\\" + doodadPath.Substring(Application.dataPath.Length + 1); //This is so nifty :3
+                doodadPath = $"Assets{Path.DirectorySeparatorChar}" + doodadPath.Substring(Application.dataPath.Length + 1); //This is so nifty :3
 
                 Vector3 doodadPosition = Vector3.zero;
                 Quaternion doodadRotation = Quaternion.identity;
@@ -135,7 +135,7 @@ namespace WowUnity
             foreach (string path in iteratingList)
             {
                 TextAsset placementData = AssetDatabase.LoadAssetAtPath<TextAsset>(path);
-                string prefabPath = Path.GetDirectoryName(path) + "\\" + Path.GetFileName(path).Replace("_ModelPlacementInformation.csv", ".obj");
+                string prefabPath = Path.GetDirectoryName(path) + Path.DirectorySeparatorChar + Path.GetFileName(path).Replace("_ModelPlacementInformation.csv", ".obj");
                 GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
                 GenerateADT(prefab, placementData);
 
