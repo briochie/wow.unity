@@ -163,7 +163,7 @@ namespace WowUnity
 
         public static void LoadMetadataAndConfigureADT(Material mat, string assetPath)
         {
-            string jsonFilePath = Path.GetDirectoryName(assetPath) + "\\" + mat.name + ".json";
+            string jsonFilePath = Path.GetDirectoryName(assetPath) + Path.DirectorySeparatorChar + mat.name + ".json";
             var sr = new StreamReader(Application.dataPath.Replace("Assets", "") + jsonFilePath);
             var fileContents = sr.ReadToEnd();
             sr.Close();
@@ -177,7 +177,7 @@ namespace WowUnity
                 currentLayer = newChunk.layers[i];
                 string texturePath = Path.Combine(Path.GetDirectoryName(@assetPath), @currentLayer.file);
                 texturePath = Path.GetFullPath(texturePath);
-                texturePath = texturePath.Substring(texturePath.IndexOf("Assets\\"));
+                texturePath = texturePath.Substring(texturePath.IndexOf($"Assets{Path.DirectorySeparatorChar}"));
 
                 Texture2D layerTexture = (Texture2D)AssetDatabase.LoadAssetAtPath(texturePath, typeof(Texture2D));
                 mat.SetTexture("Layer_" + i, layerTexture);
