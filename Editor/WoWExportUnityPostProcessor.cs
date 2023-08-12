@@ -50,7 +50,7 @@ public class WoWExportUnityPostprocessor : AssetPostprocessor
 
     public void OnPreprocessModel()
     {
-        if (!ValidAsset(assetPath))
+        if (!assetPath.Contains(".obj"))
         {
             return;
         }
