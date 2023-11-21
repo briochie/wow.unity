@@ -76,9 +76,9 @@ namespace WowUnity
                     doodadPosition.y = float.Parse(fields[2], CultureInfo.InvariantCulture);
 
                     Vector3 eulerRotation = Vector3.zero;
-                    eulerRotation.x = float.Parse(fields[6], CultureInfo.InvariantCulture);
+                    eulerRotation.x = float.Parse(fields[6], CultureInfo.InvariantCulture) * -1;
                     eulerRotation.y = float.Parse(fields[5], CultureInfo.InvariantCulture) * -1 - 90;
-                    eulerRotation.z = float.Parse(fields[4], CultureInfo.InvariantCulture);
+                    eulerRotation.z = float.Parse(fields[4], CultureInfo.InvariantCulture) * -1;
 
                     doodadRotation.eulerAngles = eulerRotation;
                 }
