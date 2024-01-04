@@ -9,8 +9,5 @@
     "email": "me@briochie.site",
     "url": "https://github.com/briochie"
   },
-  "type": "tool",
-  "dependencies": {
-    "com.unity.nuget.newtonsoft-json": "^3.2.1"
-  }
+  "type": "tool"
 }
