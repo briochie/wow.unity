@@ -37,14 +37,14 @@ namespace WowUnity
 
                 GameObject prefab = FindOrCreatePrefab(path);
 
-                if (metadata.textureTransforms.Count > 0 && metadata.textureTransforms[0].translation.timestamps.Count > 0)
-                {
-                    for (int i = 0; i < metadata.textureTransforms.Count; i++)
-                    {
-                        AnimationClip newClip = AnimationUtility.CreateAnimationClip(metadata.textureTransforms[i]);
-                        AssetDatabase.CreateAsset(newClip, Path.GetDirectoryName(path) + "/" + Path.GetFileNameWithoutExtension(path) + "[" + i +  "]" + ".anim");
-                    }
-                }
+                // if (metadata.textureTransforms.Count > 0 && metadata.textureTransforms[0].translation.timestamps.Count > 0)
+                // {
+                //     for (int i = 0; i < metadata.textureTransforms.Count; i++)
+                //     {
+                //         AnimationClip newClip = AnimationUtility.CreateAnimationClip(metadata.textureTransforms[i]);
+                //         AssetDatabase.CreateAsset(newClip, Path.GetDirectoryName(path) + "/" + Path.GetFileNameWithoutExtension(path) + "[" + i +  "]" + ".anim");
+                //     }
+                // }
             }
 
             //Processing done: remove all paths from the queue

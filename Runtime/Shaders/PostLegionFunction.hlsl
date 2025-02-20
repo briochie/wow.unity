@@ -134,6 +134,7 @@ void PostLegion_float(float4 Alpha_Map,
 	//Outputs
 	diffuseOut = matDiffuse;
 	metallicOut = metalBlend;
+	metallicOut = metalBlend + specBlend;
 	specularOut = specBlend;
 };
 #endif //MYHLSLINCLUDE_INCLUDED
